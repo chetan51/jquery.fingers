@@ -40,6 +40,8 @@ and then start binding elements to any events in the list below.
   * **absolute_dx**
   * **absolute_dy**
   
+  A couple more potentially useful things:
+  
   * **gestures**: list of currently active gestures
   * **gesture_detected.{x,y,time}**: the position and time that the gesture was detected
   * **document_vertical_scrolling**: the document is being vertically scrolled
