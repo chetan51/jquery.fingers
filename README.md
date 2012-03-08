@@ -1,4 +1,6 @@
-It's hard to do custom touch gesture detection in Javascript. This plugin keeps it simple.
+# jQuery Fingers
+
+### It's hard to do custom touch gesture detection in Javascript. This plugin keeps it simple.
 
 ## Recognized gestures
   * **pullup**: the finger is currently above the touch starting position
