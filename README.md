@@ -2,7 +2,18 @@
 
 It's hard to do custom touch gesture detection in Javascript. This plugin keeps it simple.
 
-## Recognized gestures
+## Usage
+Include the script after jQuery. (Requires jQuery 1.7+)
+
+    <script src='jquery.js'></script>
+    <script src='jquery.fingers.js'></script>
+
+Then just bind elements to any event in the list below. 
+
+    $("#box").bind 'pullright', (event, data) ->
+        alert "box pulled " + data.dx + " pixels to the right"
+
+## Recognized gestures as events
   * **pullup**: the finger is currently above the touch starting position
   * **pulldown**: the finger is currently below the touch starting position
   * **pullright**: the finger is currently to the right of the touch starting position
