@@ -3,6 +3,8 @@
   # pulldown  - the finger is currently below the touch starting position
   # pullright - the finger is currently to the right of the touch starting position
   # pullleft  - the finger is currently to the left of the touch starting position
+  # hold      - the finger was held in the same position for some time
+  # tap       - the finger tapped a position
 
 # Data passed with triggered event:
   # start.{x,y,time} - the touch starting position and time
@@ -60,6 +62,8 @@ $.event.special.pullup    = setup: eventSetup, teardown: eventTeardown
 $.event.special.pulldown  = setup: eventSetup, teardown: eventTeardown
 $.event.special.pullright = setup: eventSetup, teardown: eventTeardown
 $.event.special.pullleft  = setup: eventSetup, teardown: eventTeardown
+$.event.special.hold      = setup: eventSetup, teardown: eventTeardown
+$.event.special.tap       = setup: eventSetup, teardown: eventTeardown
  
 
 # Bind to whole document
@@ -104,7 +108,7 @@ elementTouchStartHandler = (event) ->
       threshold = thresholds.distance.hold
       touch_data.gestures.hold = (touch_data.absolute_dx <= threshold and touch_data.absolute_dy <= threshold)
       console.log "holding" if touch_data.gestures.hold
-      touch_data.gesture_detected = Object.create touch_data.last
+      gestureDetected()
    
   return true
 
@@ -114,7 +118,7 @@ elementTouchMoveHandler = (event) ->
   threshold = thresholds.distance.hold
   if not touch_data.gesture_detected and (touch_data.absolute_dx > threshold or touch_data.absolute_dy > threshold)
     console.log "gesture detected by moving"
-    touch_data.gesture_detected = Object.create touch_data.last
+    gestureDetected()
   
   if touch_data.gesture_detected
     touch_data.dx = calibrateDiff touch_data.absolute_dx, 'x'
@@ -151,12 +155,7 @@ elementTouchMoveHandler = (event) ->
         touch_data.gestures.pullleft  = true
         touch_data.gestures.pullright = false
 
-    # Trigger the correct event on the element
-    gesture_list = Object.keys(touch_data.gestures)
-    for gesture in gesture_list
-      if touch_data.gestures[gesture]
-        #console.log "triggering event on element. gesture: " + gesture
-        $(event.target).trigger gesture, touch_data
+      triggerEvents()   
 
   return true
 
@@ -175,7 +174,26 @@ calibrateDiff = (diff, diff_key) ->
  
 elementTouchEndHandler = (event) ->
   #console.log "element touchend"
+  if Object.keys(touch_data.gestures).length is 0 # no gestures detected
+    threshold = thresholds.distance.hold
+    if touch_data.absolute_dx <= threshold and touch_data.absolute_dy <= threshold # within holding threshold
+      # Tapped
+      touch_data.gestures.tap = true
+      gestureDetected()
+      triggerEvents()
+
   return true
+
+gestureDetected = ->
+  touch_data.gesture_detected = Object.create touch_data.last # REFACTOR
+
+triggerEvents = ->
+  # Trigger the correct event on the element
+  gesture_list = Object.keys(touch_data.gestures)
+  for gesture in gesture_list
+    if touch_data.gestures[gesture]
+      #console.log "triggering event on element. gesture: " + gesture
+      $(event.target).trigger gesture, touch_data
 
 documentTouchStartHandler = (event) ->
   #console.log "document touchstart"
