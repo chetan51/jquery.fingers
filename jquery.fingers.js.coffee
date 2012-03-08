@@ -1,6 +1,8 @@
 # Recognized gestures:
-  # pullup   - the finger is currently above the touch starting position
-  # pulldown - the finger is currently below the touch starting position
+  # pullup    - the finger is currently above the touch starting position
+  # pulldown  - the finger is currently below the touch starting position
+  # pullright - the finger is currently to the right of the touch starting position
+  # pullleft  - the finger is currently to the left of the touch starting position
 
 $ = jQuery
 
@@ -39,8 +41,10 @@ eventTeardown = ->
   # Unbind touch events
   $(this).off '.fingers'
  
-$.event.special.pullup   = setup: eventSetup, teardown: eventTeardown
-$.event.special.pulldown = setup: eventSetup, teardown: eventTeardown
+$.event.special.pullup    = setup: eventSetup, teardown: eventTeardown
+$.event.special.pulldown  = setup: eventSetup, teardown: eventTeardown
+$.event.special.pullright = setup: eventSetup, teardown: eventTeardown
+$.event.special.pullleft  = setup: eventSetup, teardown: eventTeardown
  
 
 # Bind to whole document
@@ -91,6 +95,18 @@ elementTouchMoveHandler = (event) ->
     # Pulling up
     touch_data.gestures.pullup   = true
     touch_data.gestures.pulldown = false
+    
+  if touch_data.gestures.hold or touch_data.dx is 0
+    touch_data.gestures.pullright  = false
+    touch_data.gestures.pullleft   = false
+  else if touch_data.dx > 0
+    # Pulling right
+    touch_data.gestures.pullright  = true
+    touch_data.gestures.pullleft   = false
+  else if touch_data.dx < 0
+    # Pulling left
+    touch_data.gestures.pullleft  = true
+    touch_data.gestures.pullright = false
 
   # Trigger the correct event on the element
   gesture_list = Object.keys(touch_data.gestures)
