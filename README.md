@@ -10,7 +10,7 @@ Include the script after jQuery...
     <script src='jquery.js'></script>
     <script src='jquery.fingers.js'></script>
 
-and then start binding elements to any event in the list below. 
+and then start binding elements to any events in the list below. 
 
     $("#box").bind 'pullright', (event, data) ->
         alert "box pulled " + data.dx + " pixels to the right"
