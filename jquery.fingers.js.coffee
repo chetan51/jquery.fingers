@@ -107,8 +107,9 @@ elementTouchStartHandler = (event) ->
       console.log "gesture detected by time"
       threshold = thresholds.distance.hold
       touch_data.gestures.hold = (touch_data.absolute_dx <= threshold and touch_data.absolute_dy <= threshold)
-      console.log "holding" if touch_data.gestures.hold
+      #console.log "holding" if touch_data.gestures.hold
       gestureDetected()
+      triggerEvents($(event.target)) if touch_data.gestures.hold
    
   return true
 
@@ -155,7 +156,7 @@ elementTouchMoveHandler = (event) ->
         touch_data.gestures.pullleft  = true
         touch_data.gestures.pullright = false
 
-      triggerEvents()   
+      triggerEvents $(event.target)
 
   return true
 
@@ -180,20 +181,20 @@ elementTouchEndHandler = (event) ->
       # Tapped
       touch_data.gestures.tap = true
       gestureDetected()
-      triggerEvents()
+      triggerEvents $(event.target)
 
   return true
 
 gestureDetected = ->
   touch_data.gesture_detected = Object.create touch_data.last # REFACTOR
 
-triggerEvents = ->
+triggerEvents = (element) ->
   # Trigger the correct event on the element
   gesture_list = Object.keys(touch_data.gestures)
   for gesture in gesture_list
     if touch_data.gestures[gesture]
       #console.log "triggering event on element. gesture: " + gesture
-      $(event.target).trigger gesture, touch_data
+      element.trigger gesture, touch_data
 
 documentTouchStartHandler = (event) ->
   #console.log "document touchstart"
