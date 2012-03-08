@@ -7,11 +7,15 @@
 # Data passed with triggered event:
   # start.{x,y,time} - the touch starting position and time
   # last.{x,y,time}  - the touch starting position and time
-  # (/note The following two values are normalized to accommodate for hold threshold for smoother motion)
+  # (/note The following two values are calibrated to accommodate the delayed gesture detection due to hold detection)
   # dx               - the horizontal change in motion since touch start
   # dy               - the vertical change in motion since touch start
-  # (/endnote)
+  # (The following two values are the absolute versions of the above two)
+  # absolute_dx
+  # absolute_dy
+  # (/end note)
   # gestures         - list of currently active gestures
+  # gesture_detected.{x,y,time} - the position and time that the gesture was detected
 
 $ = jQuery
 
@@ -21,16 +25,17 @@ $ = jQuery
 thresholds =
   distance:
     scroll : 3
-    hold  : 3
+    hold   : 3
   time:
-    hold  : 300
+    hold   : 300
 
 
 # Variables
 touch_data = {}
 touch_data.start    = {}
-touch_data.end      = {}
+touch_data.last     = {}
 touch_data.gestures = {}
+touch_data.gesture_detected = {}
 
 touch_state = {}
 
@@ -65,67 +70,107 @@ $(document).ready ->
 # Event handlers
 touchStartHandler = (event) ->
   #console.log "touchstart"
+  # Reset all variables
   touch_data.start = extractTouchData event
   touch_data.last  = Object.create touch_data.start
+  touch_data.gesture_detected = null # means no gesture detected
+  touch_data.gestures = {}
   
   touch_data.dx = 0
   touch_data.dy = 0
+  touch_data.absolute_dx = 0
+  touch_data.absolute_dy = 0
 
 touchMoveHandler = (event) ->
   #console.log "touchmove"
   touch_data.last = extractTouchData event
   
-  touch_data.dx = touch_data.last.x - touch_data.start.x
-  touch_data.dy = touch_data.last.y - touch_data.start.y
+  touch_data.absolute_dx = touch_data.last.x - touch_data.start.x
+  touch_data.absolute_dy = touch_data.last.y - touch_data.start.y
 
 touchEndHandler = (event) ->
   #console.log "touchend"
 
 
 elementTouchStartHandler = (event) ->
-  console.log "element touchstart"
+  #console.log "element touchstart"
+  
   # After a delay, check if holding
   delay thresholds.time.hold, ->
-    threshold = thresholds.distance.hold
-    touch_data.gestures.hold = (touch_data.dx <= threshold and touch_data.dy <= threshold)
-    console.log "holding" if touch_data.gestures.hold
+    if not touch_data.gesture_detected
+      console.log "gesture detected by time"
+      threshold = thresholds.distance.hold
+      touch_data.gestures.hold = (touch_data.absolute_dx <= threshold and touch_data.absolute_dy <= threshold)
+      console.log "holding" if touch_data.gestures.hold
+      touch_data.gesture_detected = Object.create touch_data.last
+   
   return true
 
 elementTouchMoveHandler = (event) ->
-  #console.log "element touchmove"
-  if touch_data.gestures.hold or touch_data.dy is 0
-    touch_data.gestures.pullup   = false
-    touch_data.gestures.pulldown = false
-  else if touch_data.dy > 0
-    # Pulling down
-    touch_data.gestures.pulldown = true
-    touch_data.gestures.pullup   = false
-  else if touch_data.dy < 0
-    # Pulling up
-    touch_data.gestures.pullup   = true
-    touch_data.gestures.pulldown = false
+  #console.log "element touchmove. absolute dx: " + touch_data.absolute_dx + ". absolute dy: " + touch_data.absolute_dy
+  # Gesture detected if moved outside the hold threshold
+  threshold = thresholds.distance.hold
+  if not touch_data.gesture_detected and (touch_data.absolute_dx > threshold or touch_data.absolute_dy > threshold)
+    console.log "gesture detected by moving"
+    touch_data.gesture_detected = Object.create touch_data.last
+  
+  if touch_data.gesture_detected
+    touch_data.dx = calibrateDiff touch_data.absolute_dx, 'x'
+    touch_data.dy = calibrateDiff touch_data.absolute_dy, 'y'
     
-  if touch_data.gestures.hold or touch_data.dx is 0
-    touch_data.gestures.pullright  = false
-    touch_data.gestures.pullleft   = false
-  else if touch_data.dx > 0
-    # Pulling right
-    touch_data.gestures.pullright  = true
-    touch_data.gestures.pullleft   = false
-  else if touch_data.dx < 0
-    # Pulling left
-    touch_data.gestures.pullleft  = true
-    touch_data.gestures.pullright = false
+    # Detect pulling if not holding
+    if touch_data.gestures.hold is true
+      touch_data.gestures.pullup    = false
+      touch_data.gestures.pulldown  = false
+      touch_data.gestures.pullright = false
+      touch_data.gestures.pullleft  = false
+    else
+      if touch_data.dy is 0
+        touch_data.gestures.pullup   = false
+        touch_data.gestures.pulldown = false
+      else if touch_data.dy > 0
+        # Pulling down
+        touch_data.gestures.pulldown = true
+        touch_data.gestures.pullup   = false
+      else if touch_data.dy < 0
+        # Pulling up
+        touch_data.gestures.pullup   = true
+        touch_data.gestures.pulldown = false
+        
+      if touch_data.dx is 0
+        touch_data.gestures.pullright  = false
+        touch_data.gestures.pullleft   = false
+      else if touch_data.dx > 0
+        # Pulling right
+        touch_data.gestures.pullright  = true
+        touch_data.gestures.pullleft   = false
+      else if touch_data.dx < 0
+        # Pulling left
+        touch_data.gestures.pullleft  = true
+        touch_data.gestures.pullright = false
 
-  # Trigger the correct event on the element
-  gesture_list = Object.keys(touch_data.gestures)
-  for gesture in gesture_list
-    if touch_data.gestures[gesture]
-      #console.log "triggering event on element. gesture: " + gesture
-      $(event.target).trigger gesture, touch_data
+    # Trigger the correct event on the element
+    gesture_list = Object.keys(touch_data.gestures)
+    for gesture in gesture_list
+      if touch_data.gestures[gesture]
+        #console.log "triggering event on element. gesture: " + gesture
+        $(event.target).trigger gesture, touch_data
 
   return true
 
+calibrateDiff = (diff, diff_key) ->
+  # Since we're detecting pulling with a delay due to hold tolerance, we calibrate diff to account for this
+  zero_diff = touch_data.gesture_detected[diff_key] - touch_data.start[diff_key]
+  calibrated = diff
+  
+  if diff > zero_diff
+    calibrated -= zero_diff
+  else if diff < -zero_diff
+    calibrated += zero_diff
+  else
+    calibrated = 0
+  return calibrated
+ 
 elementTouchEndHandler = (event) ->
   #console.log "element touchend"
   return true
@@ -143,13 +188,11 @@ documentTouchMoveHandler = (event) ->
   #console.log "document touchmove"
   touchMoveHandler event
   
-  dy = touch_data.last.y - touch_data.start.y
-  if Math.abs(dy) > thresholds.distance.scroll
+  if Math.abs(touch_data.absolute_dy) > thresholds.distance.scroll
     touch_state.document_vertical_scrolling = true
     #console.log "document vertical scrolling"
    
-  dx = touch_data.last.x - touch_data.start.x
-  if Math.abs(dx) > thresholds.distance.scroll
+  if Math.abs(touch_data.absolute_dx) > thresholds.distance.scroll
     touch_state.document_horizontal_scrolling = true
     #console.log "document horizontal scrolling"
    
