@@ -13,10 +13,12 @@ It's hard to do custom touch gesture detection in Javascript. This plugin keeps 
   * **last.{x,y,time}**: the touch starting position and time
   
   The following two values are calibrated to accommodate the delayed gesture detection due to hold detection:
+  
   * **dx**: the horizontal change in motion since touch start
   * **dy**: the vertical change in motion since touch start
   
   The following two values are the non-calibrated, raw versions of the two above:
+  
   * **absolute_dx**
   * **absolute_dy**
   
