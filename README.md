@@ -8,8 +8,8 @@ It's hard to do custom touch gesture detection in Javascript. This plugin keeps 
 
 Include the script after jQuery...
 
-    <script src='jquery.js'></script>
-    <script src='jquery.fingers.js'></script>
+    <script src='/path/to/jquery.js'></script>
+    <script src='/lib/jquery.fingers.js'></script>
 
 and then start binding elements to any events in the list below. 
 
