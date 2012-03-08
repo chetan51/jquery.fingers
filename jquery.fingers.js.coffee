@@ -15,7 +15,10 @@
   # absolute_dy
   # (/end note)
   # gestures         - list of currently active gestures
-  # gesture_detected.{x,y,time} - the position and time that the gesture was detected
+  # gestures         - list of currently active gestures
+  # gesture_detected.{x,y,time}   - the position and time that the gesture was detected
+  # document_vertical_scrolling   - the document is being vertically scrolled
+  # document_horizontal_scrolling - the document is being horizontally scrolled
 
 $ = jQuery
 
@@ -36,8 +39,6 @@ touch_data.start    = {}
 touch_data.last     = {}
 touch_data.gestures = {}
 touch_data.gesture_detected = {}
-
-touch_state = {}
 
 
 # Set up gestures
@@ -63,6 +64,7 @@ $.event.special.pullleft  = setup: eventSetup, teardown: eventTeardown
 
 # Bind to whole document
 $(document).ready ->
+  #console.log "binding to document touch events"
   $(document).bind 'touchstart.fingers', documentTouchStartHandler
   $(document).bind 'touchmove.fingers',  documentTouchMoveHandler
   $(document).bind 'touchend.fingers',   documentTouchEndHandler
@@ -76,8 +78,6 @@ touchStartHandler = (event) ->
   touch_data.gesture_detected = null # means no gesture detected
   touch_data.gestures = {}
   
-  touch_data.dx = 0
-  touch_data.dy = 0
   touch_data.absolute_dx = 0
   touch_data.absolute_dy = 0
 
@@ -94,6 +94,8 @@ touchEndHandler = (event) ->
 
 elementTouchStartHandler = (event) ->
   #console.log "element touchstart"
+  touch_data.dx = 0
+  touch_data.dy = 0
   
   # After a delay, check if holding
   delay thresholds.time.hold, ->
@@ -179,8 +181,8 @@ documentTouchStartHandler = (event) ->
   #console.log "document touchstart"
   touchStartHandler event
   
-  touch_state.document_vertical_scrolling   = false
-  touch_state.document_horizontal_scrolling = false
+  touch_data.document_vertical_scrolling   = false
+  touch_data.document_horizontal_scrolling = false
   
   return true
 
@@ -189,11 +191,11 @@ documentTouchMoveHandler = (event) ->
   touchMoveHandler event
   
   if Math.abs(touch_data.absolute_dy) > thresholds.distance.scroll
-    touch_state.document_vertical_scrolling = true
+    touch_data.document_vertical_scrolling = true
     #console.log "document vertical scrolling"
    
   if Math.abs(touch_data.absolute_dx) > thresholds.distance.scroll
-    touch_state.document_horizontal_scrolling = true
+    touch_data.document_horizontal_scrolling = true
     #console.log "document horizontal scrolling"
    
   return true
