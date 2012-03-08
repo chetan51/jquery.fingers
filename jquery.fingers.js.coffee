@@ -4,6 +4,15 @@
   # pullright - the finger is currently to the right of the touch starting position
   # pullleft  - the finger is currently to the left of the touch starting position
 
+# Data passed with triggered event:
+  # start.{x,y,time} - the touch starting position and time
+  # last.{x,y,time}  - the touch starting position and time
+  # (/note The following two values are normalized to accommodate for hold threshold for smoother motion)
+  # dx               - the horizontal change in motion since touch start
+  # dy               - the vertical change in motion since touch start
+  # (/endnote)
+  # gestures         - list of currently active gestures
+
 $ = jQuery
 
 
