@@ -88,7 +88,10 @@ touchStartHandler = (event) ->
       touch_data.gestures.held = (touch_data.absolute_dx <= threshold and touch_data.absolute_dy <= threshold)
       #console.log "held" if touch_data.gestures.held
       gestureDetected()
-    triggerEvents($(event.target), event) if touch_data.gestures.held
+    if touch_data.gestures.held
+      triggerEvents($(event.target), event)
+      # Only trigger it once
+      touch_data.gestures.held = false
    
   return true
 
@@ -118,38 +121,32 @@ touchMoveHandler = (event) ->
     touch_data.dx = calibrateDiff touch_data.absolute_dx, 'x'
     touch_data.dy = calibrateDiff touch_data.absolute_dy, 'y'
     
-    # Detect pulling if not held
-    if touch_data.gestures.held is true
-      touch_data.gestures.pullup    = false
-      touch_data.gestures.pulldown  = false
-      touch_data.gestures.pullright = false
-      touch_data.gestures.pullleft  = false
-    else
-      if touch_data.absolute_dy is 0
-        touch_data.gestures.pullup   = false
-        touch_data.gestures.pulldown = false
-      else if touch_data.absolute_dy > 0
-        # Pulling down
-        touch_data.gestures.pulldown = true
-        touch_data.gestures.pullup   = false
-      else if touch_data.absolute_dy < 0
-        # Pulling up
-        touch_data.gestures.pullup   = true
-        touch_data.gestures.pulldown = false
-        
-      if touch_data.absolute_dx is 0
-        touch_data.gestures.pullright = false
-        touch_data.gestures.pullleft  = false
-      else if touch_data.absolute_dx > 0
-        # Pulling right
-        touch_data.gestures.pullright = true
-        touch_data.gestures.pullleft  = false
-      else if touch_data.absolute_dx < 0
-        # Pulling left
-        touch_data.gestures.pullleft  = true
-        touch_data.gestures.pullright = false
+  # Detect pulling
+  if touch_data.absolute_dy is 0
+    touch_data.gestures.pullup   = false
+    touch_data.gestures.pulldown = false
+  else if touch_data.absolute_dy > 0
+    # Pulling down
+    touch_data.gestures.pulldown = true
+    touch_data.gestures.pullup   = false
+  else if touch_data.absolute_dy < 0
+    # Pulling up
+    touch_data.gestures.pullup   = true
+    touch_data.gestures.pulldown = false
+    
+  if touch_data.absolute_dx is 0
+    touch_data.gestures.pullright = false
+    touch_data.gestures.pullleft  = false
+  else if touch_data.absolute_dx > 0
+    # Pulling right
+    touch_data.gestures.pullright = true
+    touch_data.gestures.pullleft  = false
+  else if touch_data.absolute_dx < 0
+    # Pulling left
+    touch_data.gestures.pullleft  = true
+    touch_data.gestures.pullright = false
 
-      triggerEvents $(event.target), event
+  triggerEvents $(event.target), event
 
   return true
 
