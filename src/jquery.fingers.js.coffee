@@ -167,7 +167,6 @@ touchEndHandler = (event) ->
 
 
 # Methods
-
 gestureDetected = ->
   touch_data.gesture_detected = Object.create touch_data.last # REFACTOR
 
