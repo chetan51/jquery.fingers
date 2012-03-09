@@ -30,12 +30,10 @@ and then start binding elements to any events in the list below.
   * **start.{x,y,time}**: the touch starting position and time
   * **last.{x,y,time}**: the touch starting position and time
   
-  For the following two values, "a gesture was detected" means a gesture broke out of its uncertainty threshold, and is definitely happening:
-  
   * **dx**: the horizontal change in motion since a gesture was detected
   * **dy**: the vertical change in motion since a gesture was detected
   
-  The following two values are the absolute versions of the ones above:
+  ("a gesture was detected" means a gesture broke out of its uncertainty threshold, and is definitely happening)
   
   * **absolute_dx**: the horizontal change in motion since touch started
   * **absolute_dy**: the vertical change in motion since touch started
