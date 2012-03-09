@@ -110,7 +110,7 @@ touchMoveHandler = (event) ->
    
   # Check if gesture detected
   threshold = thresholds.distance.held
-  if not touch_data.gesture_detected and (touch_data.absolute_dx > threshold or touch_data.absolute_dy > threshold)
+  if not touch_data.gesture_detected and (Math.abs(touch_data.absolute_dx) > threshold or Math.abs(touch_data.absolute_dy) > threshold)
     #console.log "gesture detected by moving"
     gestureDetected()
   
