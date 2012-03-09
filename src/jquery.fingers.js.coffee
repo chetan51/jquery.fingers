@@ -7,6 +7,7 @@
   # tapped    - the finger tapped a position
 
 # Data passed with triggered event:
+  # originalEvent    - the original touch event
   # start.{x,y,time} - the touch starting position and time
   # last.{x,y,time}  - the touch starting position and time
   # (/note The following two values are calibrated to accommodate the delayed gesture detection due to held detection)
@@ -87,7 +88,7 @@ touchStartHandler = (event) ->
       touch_data.gestures.held = (touch_data.absolute_dx <= threshold and touch_data.absolute_dy <= threshold)
       #console.log "held" if touch_data.gestures.held
       gestureDetected()
-    triggerEvents($(event.target)) if touch_data.gestures.held
+    triggerEvents($(event.target), event) if touch_data.gestures.held
    
   return true
 
@@ -148,7 +149,7 @@ touchMoveHandler = (event) ->
         touch_data.gestures.pullleft  = true
         touch_data.gestures.pullright = false
 
-      triggerEvents $(event.target)
+      triggerEvents $(event.target), event
 
   return true
 
@@ -161,7 +162,7 @@ touchEndHandler = (event) ->
       # Tapped
       touch_data.gestures.tapped = true
       gestureDetected()
-      triggerEvents $(event.target)
+      triggerEvents $(event.target), event
 
   return true
 
@@ -170,13 +171,13 @@ touchEndHandler = (event) ->
 gestureDetected = ->
   touch_data.gesture_detected = Object.create touch_data.last # REFACTOR
 
-triggerEvents = (element) ->
+triggerEvents = (element, original_event) ->
   # Trigger the correct event on the element
   gesture_list = Object.keys(touch_data.gestures)
   for gesture in gesture_list
     if touch_data.gestures[gesture]
       #console.log "triggering event on element. gesture: " + gesture + ". element: "
-      #console.log element
+      touch_data.originalEvent = original_event
       element.trigger gesture, touch_data
 
 
