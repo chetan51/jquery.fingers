@@ -32,6 +32,7 @@ thresholds =
   distance:
     scroll : 3
     held   : 3
+    pull   : 3
   time:
     held   : 300
 
@@ -111,10 +112,10 @@ touchMoveHandler = (event) ->
     touch_data.document_horizontal_scrolling = true
     #console.log "document horizontal scrolling"
    
-  # Check if gesture detected
-  threshold = thresholds.distance.held
+  # Check if pull gesture broke out of its threshold
+  threshold = thresholds.distance.pull
   if not touch_data.gesture_detected and (Math.abs(touch_data.absolute_dx) > threshold or Math.abs(touch_data.absolute_dy) > threshold)
-    #console.log "gesture detected by moving"
+    #console.log "pull gesture detected"
     gestureDetected()
   
   if touch_data.gesture_detected
