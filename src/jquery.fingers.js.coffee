@@ -125,26 +125,26 @@ touchMoveHandler = (event) ->
       touch_data.gestures.pullright = false
       touch_data.gestures.pullleft  = false
     else
-      if touch_data.dy is 0
+      if touch_data.absolute_dy is 0
         touch_data.gestures.pullup   = false
         touch_data.gestures.pulldown = false
-      else if touch_data.dy > 0
+      else if touch_data.absolute_dy > 0
         # Pulling down
         touch_data.gestures.pulldown = true
         touch_data.gestures.pullup   = false
-      else if touch_data.dy < 0
+      else if touch_data.absolute_dy < 0
         # Pulling up
         touch_data.gestures.pullup   = true
         touch_data.gestures.pulldown = false
         
-      if touch_data.dx is 0
+      if touch_data.absolute_dx is 0
         touch_data.gestures.pullright = false
         touch_data.gestures.pullleft  = false
-      else if touch_data.dx > 0
+      else if touch_data.absolute_dx > 0
         # Pulling right
         touch_data.gestures.pullright = true
         touch_data.gestures.pullleft  = false
-      else if touch_data.dx < 0
+      else if touch_data.absolute_dx < 0
         # Pulling left
         touch_data.gestures.pullleft  = true
         touch_data.gestures.pullright = false
