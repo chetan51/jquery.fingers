@@ -176,8 +176,8 @@ triggerEvents = (element) ->
   gesture_list = Object.keys(touch_data.gestures)
   for gesture in gesture_list
     if touch_data.gestures[gesture]
-      console.log "triggering event on element. gesture: " + gesture + ". element: "
-      console.log element
+      #console.log "triggering event on element. gesture: " + gesture + ". element: "
+      #console.log element
       element.trigger gesture, touch_data
 
 
