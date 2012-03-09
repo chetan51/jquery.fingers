@@ -22,23 +22,23 @@ and then start binding elements to any events in the list below.
   * **pulldown**: the finger is currently below the touch starting position
   * **pullright**: the finger is currently to the right of the touch starting position
   * **pullleft**: the finger is currently to the left of the touch starting position
-  * **hold**: the finger was held in the same position for some time
-  * **tap**: the finger tapped a position
+  * **held**: the finger was held in the same position for some time
+  * **tapped**: the finger tapped a position
 
 ## Data passed with triggered event
 
   * **start.{x,y,time}**: the touch starting position and time
   * **last.{x,y,time}**: the touch starting position and time
   
-  The following two values are calibrated to accommodate the delayed gesture detection due to hold detection:
+  For the following two values, "a gesture was detected" means a gesture broke out of its uncertainty threshold, and is definitely happening:
   
-  * **dx**: the horizontal change in motion since touch start
-  * **dy**: the vertical change in motion since touch start
+  * **dx**: the horizontal change in motion since a gesture was detected
+  * **dy**: the vertical change in motion since a gesture was detected
   
-  The following two values are the non-calibrated, raw versions of the two above:
+  The following two values are the absolute versions of the ones above:
   
-  * **absolute_dx**
-  * **absolute_dy**
+  * **absolute_dx**: the horizontal change in motion since touch started
+  * **absolute_dy**: the vertical change in motion since touch started
   
   A couple more potentially useful things:
   
