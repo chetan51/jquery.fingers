@@ -97,19 +97,21 @@ touchEndHandler = (event) ->
 
 
 elementTouchStartHandler = (event) ->
-  #console.log "element touchstart"
+  #console.log "element touchstart. element: "
+  #console.log $(this)
   touch_data.dx = 0
   touch_data.dy = 0
   
   # After a delay, check if holding
-  delay thresholds.time.hold, ->
+  delay thresholds.time.hold, =>
+    #console.log "checking if holding"
     if not touch_data.gesture_detected
       console.log "gesture detected by time"
       threshold = thresholds.distance.hold
       touch_data.gestures.hold = (touch_data.absolute_dx <= threshold and touch_data.absolute_dy <= threshold)
       #console.log "holding" if touch_data.gestures.hold
       gestureDetected()
-      triggerEvents($(event.target)) if touch_data.gestures.hold
+    triggerEvents($(this)) if touch_data.gestures.hold
    
   return true
 
@@ -145,18 +147,18 @@ elementTouchMoveHandler = (event) ->
         touch_data.gestures.pulldown = false
         
       if touch_data.dx is 0
-        touch_data.gestures.pullright  = false
-        touch_data.gestures.pullleft   = false
+        touch_data.gestures.pullright = false
+        touch_data.gestures.pullleft  = false
       else if touch_data.dx > 0
         # Pulling right
-        touch_data.gestures.pullright  = true
-        touch_data.gestures.pullleft   = false
+        touch_data.gestures.pullright = true
+        touch_data.gestures.pullleft  = false
       else if touch_data.dx < 0
         # Pulling left
         touch_data.gestures.pullleft  = true
         touch_data.gestures.pullright = false
 
-      triggerEvents $(event.target)
+      triggerEvents $(this)
 
   return true
 
@@ -181,7 +183,7 @@ elementTouchEndHandler = (event) ->
       # Tapped
       touch_data.gestures.tap = true
       gestureDetected()
-      triggerEvents $(event.target)
+      triggerEvents $(this)
 
   return true
 
@@ -193,7 +195,8 @@ triggerEvents = (element) ->
   gesture_list = Object.keys(touch_data.gestures)
   for gesture in gesture_list
     if touch_data.gestures[gesture]
-      #console.log "triggering event on element. gesture: " + gesture
+      #console.log "triggering event on element. gesture: " + gesture + ". element: "
+      #console.log element
       element.trigger gesture, touch_data
 
 documentTouchStartHandler = (event) ->
