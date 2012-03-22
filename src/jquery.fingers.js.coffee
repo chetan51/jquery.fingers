@@ -115,8 +115,9 @@ touchMoveHandler = (event) ->
   # Check if pull gesture broke out of its threshold
   threshold = thresholds.distance.pull
   if not touch_data.gesture_detected and (Math.abs(touch_data.absolute_dx) > threshold or Math.abs(touch_data.absolute_dy) > threshold)
-    #console.log "pull gesture detected"
+    console.log "pull gesture detected"
     gestureDetected()
+    zero_diff = touch_data.gesture_detected['x'] - touch_data.start['x']
   
   if touch_data.gesture_detected
     touch_data.dx = calibrateDiff touch_data.absolute_dx, 'x'
@@ -188,15 +189,7 @@ extractTouchData = (event) ->
 calibrateDiff = (diff, diff_key) ->
   # Since we're detecting pulling with a delay due to held tolerance, we calibrate diff to account for this
   zero_diff = touch_data.gesture_detected[diff_key] - touch_data.start[diff_key]
-  calibrated = diff
-  
-  if diff > zero_diff
-    calibrated -= zero_diff
-  else if diff < -zero_diff
-    calibrated += zero_diff
-  else
-    calibrated = 0
-  return calibrated
+  return diff - zero_diff
  
 
 # Helpers
